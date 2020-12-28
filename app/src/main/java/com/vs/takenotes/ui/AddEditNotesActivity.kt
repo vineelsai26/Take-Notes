@@ -1,5 +1,6 @@
 package com.vs.takenotes.ui
 
+import android.graphics.Color
 import android.graphics.Rect
 import android.os.Bundle
 import android.text.Editable
@@ -27,7 +28,7 @@ class AddEditNotesActivity : AppCompatActivity() {
     private var isKeyboardOpened = 0
     private lateinit var title: String
     private lateinit var description: String
-    private var colour = "#FFFFFF"
+    private var color = "#FFFFFF"
     private val viewModel: AddEditNotesViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,6 +50,11 @@ class AddEditNotesActivity : AppCompatActivity() {
         if (description.isNotEmpty() && description != "null") {
             noteTitle.text = Editable.Factory.getInstance().newEditable(title)
             noteDescription.text = Editable.Factory.getInstance().newEditable(description)
+            notesLayout.setBackgroundColor(
+                Color.parseColor(
+                    intent.getStringExtra("color").toString()
+                )
+            )
         }
 
         val sdf = SimpleDateFormat("d MMMM hh:mm aa", Locale.getDefault())
@@ -101,22 +107,33 @@ class AddEditNotesActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.done -> {
-                if (description != "null" && description != noteDescription.text.toString()) {
+                if (description != "null") {
                     val title = noteTitle.text.toString()
                     val description = noteDescription.text.toString()
                     val id = intent.getIntExtra("id", -1)
                     val created = intent.getLongExtra("created", -1)
-                    viewModel.update(title, description, id, created)
+
+                    viewModel.update(
+                        Note(
+                            title = title,
+                            description = description,
+                            id = id,
+                            color = color,
+                            created = created
+                        )
+                    )
+
                     setResult(RESULT_OK, intent)
                     finish()
-                } else if (description == noteDescription.text.toString() && description.isNotBlank()) {
-                    finish()
                 } else {
+                    if (color == "null") {
+                        color = "#FFFFFF"
+                    }
                     viewModel.insert(
                         Note(
                             title = noteTitle.text.toString(),
                             description = noteDescription.text.toString(),
-                            color = colour
+                            color = color
                         )
                     )
                 }
@@ -130,9 +147,9 @@ class AddEditNotesActivity : AppCompatActivity() {
                     .setColorSwatch(ColorSwatch._300)
                     .setColorShape(ColorShape.SQAURE)
                     .setDefaultColor("#FFFFFF")
-                    .setColorListener { color, colorHex ->
-                        colour = colorHex
-                        notesLayout.setBackgroundColor(color)
+                    .setColorListener { colorInt, colorHex ->
+                        color = colorHex
+                        notesLayout.setBackgroundColor(colorInt)
                     }
                     .show()
                 false

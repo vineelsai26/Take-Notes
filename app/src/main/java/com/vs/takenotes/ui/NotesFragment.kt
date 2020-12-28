@@ -63,6 +63,7 @@ class NotesFragment : Fragment(R.layout.fragment_notes), NotesAdapter.OnItemClic
         intent.putExtra("description", note.description)
         intent.putExtra("id", note.id)
         intent.putExtra("created", note.created)
+        intent.putExtra("color", note.color)
         activityForResult.launch(intent)
     }
 

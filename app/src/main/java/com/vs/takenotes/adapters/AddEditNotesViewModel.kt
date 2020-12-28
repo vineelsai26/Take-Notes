@@ -15,15 +15,7 @@ class AddEditNotesViewModel @ViewModelInject constructor(
         noteDao.insert(note)
     }
 
-    fun update(noteTitle: String, noteDescription: String, id: Int, created: Long) =
-        viewModelScope.launch {
-            noteDao.update(
-                Note(
-                    title = noteTitle,
-                    description = noteDescription,
-                    id = id,
-                    created = created
-                )
-            )
-        }
+    fun update(note: Note) = viewModelScope.launch {
+        noteDao.update(note)
+    }
 }
